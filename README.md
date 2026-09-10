@@ -1,206 +1,388 @@
-# Smart Heritage Conservation Platform
-## Gujarat Hackathon 2026
+# 🏛️ HeritageGuardian AI
+### Smart Heritage Conservation & Visitor Experience Platform
 
-> **Protect Gujarat's Heritage with Agentic AI**
->
-> Intelligent visitor management, personalised heritage experiences, and conservation decision support for Modhera Sun Temple and Ahmedabad Walled City.
+> **IBM Hackathon Submission** — Gujarat Heritage Sites · IBM Granite LLM · Multi-Agent AI Architecture
 
 ---
 
-## Problem
+## 🎯 Problem Statement
 
-Gujarat's UNESCO-listed heritage sites face mounting pressure from rising visitor numbers, inadequate real-time monitoring, and fragmented conservation workflows. Conservation authorities lack integrated tools to manage visitor flow, monitor structural health, and generate timely conservation reports.
+Gujarat's UNESCO heritage locations — Ahmedabad's Walled City, Modhera Sun Temple, and others — face critical challenges:
 
-## Solution
+| Challenge | Impact |
+|---|---|
+| Structural deterioration & weathering | Irreversible loss of heritage fabric |
+| Urban encroachment near protected zones | Boundary violations, visual obstruction |
+| Unmanaged tourist footfall & overcrowding | Structural stress, visitor safety risks |
+| Lack of personalized digital storytelling | Disengaged visitors, reduced cultural value |
+| No unified AI platform for authorities | Fragmented monitoring, delayed response |
 
-A full-stack agentic AI platform that coordinates five specialised agents through a central Heritage Orchestrator to deliver:
-- **Visitor Flow Management** — real-time pressure analysis with redistribution recommendations
-- **Personalised Heritage Storytelling** — grounded AI itineraries from a verified knowledge base
-- **Conservation Reporting** — multi-factor decision-support reports with human-verification workflows
-- **Structural Health Monitoring** — demo observation-based conservation flagging
-- **Encroachment Detection** — boundary monitoring with cautious, human-verified flagging
+---
 
-## Architecture
+## 💡 Solution: HeritageGuardian AI
+
+A **production-quality agentic AI platform** featuring five cooperating AI agents coordinated through a central IBM Granite-powered orchestrator, providing:
+
+- Real-time structural health monitoring via AI-assisted image analysis
+- Visitor crowd management with heatmaps and routing
+- Automated encroachment detection with before/after comparison
+- Personalized multilingual heritage storytelling
+- Authority-ready conservation reports with Granite AI summaries
+- Cross-agent correlation (visitor × structural × encroachment)
+- One-click hackathon demo mode
+
+---
+
+## 🤖 The Five AI Agents
+
+### 1. Structural Health Monitoring Agent
+- Analyzes heritage structure images for cracks, deterioration, weathering
+- Produces risk score 0–100 with confidence rating
+- Classifies: Healthy / Low / Moderate / High / Critical
+- Compares current vs. historical inspection images
+- Sensor reading integration (moisture, temperature)
+- **Disclaimer**: AI-assisted observations only — NOT certified engineering assessments
+
+### 2. Visitor Flow Management Agent
+- Simulates real-time visitor density per site and zone
+- Crowd classification: 🟢 Green / 🟡 Yellow / 🟠 Orange / 🔴 Red
+- Heatmap showing per-zone density
+- Route diversion recommendations
+- Hourly and weekly visitor trend charts
+
+### 3. Personalized Heritage Storytelling Agent
+- Generates personalized narratives via IBM Granite
+- Supports: English, Hindi, Gujarati
+- Age-appropriate storytelling (Child → Senior)
+- Interest-based content: Architecture, Science, Religion, Food, Photography, etc.
+- Timed walking routes (15–180 min)
+- Did You Know? sections and follow-up questions
+
+### 4. Encroachment Detection Agent
+- Detects potential boundary violations via image analysis
+- Before/after comparison with historical imagery
+- Types: New construction, temporary structures, illegal extensions
+- Severity-based action plans for authorities
+- **Legal disclaimer**: Observations only — requires field verification
+
+### 5. Conservation Reporting Agent
+- Aggregates all agent outputs into authority-ready reports
+- IBM Granite executive summary generation
+- Cross-agent correlation alerts
+- Export: JSON, CSV (PDF-ready)
+- Automatic task creation for high-risk findings
+
+---
+
+## 🧠 Agent Orchestrator
+
+The central orchestrator:
+1. Receives event/request
+2. Determines which agents to invoke
+3. Runs agents (in parallel where possible)
+4. Detects cross-agent correlations (Visitor × Structural, Encroachment × Structural)
+5. Sends combined context to IBM Granite for integrated reasoning
+6. Returns actionable recommendations
+7. Logs all activity to the Agent Activity terminal
+
+---
+
+## 🔁 Cross-Agent Workflows
+
+### Scenario A: Visitor-Structural Correlation
+```
+Visitor Agent: "Orange alert — 78% occupancy at Zone A"
+     ↓
+Structural Agent: "Moderate risk — fragile zone at Zone A facade"
+     ↓
+Orchestrator: "Geographic overlap detected"
+     ↓
+IBM Granite: "Combined risk exceeds threshold"
+     ↓
+System: "Redirect visitors to Route B. Inspect in 7 days."
+```
+
+### Scenario B: Encroachment-Structural Correlation
+```
+Encroachment Agent: "Potential construction near northern boundary"
+     ↓
+Structural Agent: "Adjacent structure shows deterioration"
+     ↓
+Orchestrator: "Geographic correlation identified"
+     ↓
+IBM Granite: "Joint field verification recommended"
+     ↓
+Conservation Agent: "Emergency task created for Protection Officer"
+```
+
+---
+
+## 🏗️ Architecture
 
 ```
-USER GOAL
-   ↓
-HERITAGE ORCHESTRATOR (FastAPI backend)
-   ↓
-FIVE SPECIALISED AGENTS (Python async)
-   ↓
-HERITAGE KNOWLEDGE BASE + VISITOR METRICS (SQLite/PostgreSQL)
-   ↓
-IBM GRANITE (watsonx.ai — optional, graceful fallback)
-   ↓
-VALIDATED STRUCTURED RESULTS
-   ↓
-DATABASE (agent_runs, conservation_reports, alerts)
-   ↓
-REACT FRONTEND (Vite + TypeScript)
+┌─────────────────────────────────────────────────────┐
+│                 React.js Frontend                    │
+│  Dashboard · Sites · Structural · Visitor · Guide   │
+│  Encroachment · Reports · Agent Activity · Demo     │
+└─────────────────┬───────────────────────────────────┘
+                  │ REST API (FastAPI)
+┌─────────────────▼───────────────────────────────────┐
+│              Agent Orchestrator                      │
+│         (Routes · Correlates · Coordinates)          │
+└──┬──────────┬──────────┬──────────┬──────────┬──────┘
+   │          │          │          │          │
+   ▼          ▼          ▼          ▼          ▼
+Structural  Visitor  Storytelling Encroach  Conservation
+ Agent      Agent    Agent (IBM   Agent     Agent
+ (CV sim)  (IoT sim) Granite)    (CV sim)  (Multi-agent)
+   │          │          │          │          │
+   └──────────┴──────────┴──────────┴──────────┘
+                         │
+              ┌──────────▼──────────┐
+              │   IBM Granite LLM   │
+              │  (watsonx.ai API)   │
+              └─────────────────────┘
+                         │
+              ┌──────────▼──────────┐
+              │  SQLite / PostgreSQL │
+              │    (SQLAlchemy)      │
+              └─────────────────────┘
 ```
 
-## Tech Stack
+---
+
+## 🛠️ Technology Stack
 
 | Layer | Technology |
-|-------|-----------|
-| Frontend | React 18 + TypeScript + Vite + Recharts |
-| Backend | Python 3.12+ + FastAPI + SQLAlchemy |
-| Database | SQLite (dev) / PostgreSQL-compatible |
-| AI Runtime | IBM Granite via watsonx.ai (optional) |
-| AI Dev Tool | IBM Bob |
+|---|---|
+| AI/LLM | IBM Granite 13B Instruct (via watsonx.ai) |
+| AI Framework | Custom multi-agent orchestrator |
+| Backend | Python 3.11 · FastAPI · Uvicorn |
+| Frontend | React 18 · Vite · Tailwind CSS |
+| Database | SQLite (dev) · PostgreSQL (production) |
+| ORM | SQLAlchemy 2.0 |
+| Charts | Recharts |
+| Map | React Leaflet |
+| HTTP Client | httpx (async) |
+| Cloud Ready | IBM Cloud · Docker · docker-compose |
 
-## Agent Architecture
+---
 
-All five agents share a common pattern:
-1. **Deterministic computation** (arithmetic, rule-based classification) — never delegated to AI
-2. **Grounded retrieval** — only verified heritage content used
-3. **Granite enhancement** — contextual explanation and narration
-4. **Structured output** — typed JSON responses
-5. **Graceful fallback** — works without Granite configured
-6. **Human escalation** — consequential findings always flagged for human review
+## 📁 Project Structure
 
-## Local Setup
-
-### Prerequisites
-- Python 3.12+ (tested on 3.14)
-- Node.js 18+
-
-### Backend
-
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+```
+heritageguardian/
+├── backend/
+│   ├── agents/
+│   │   ├── structural_agent.py   # Structural health monitoring
+│   │   ├── visitor_agent.py      # Visitor flow management
+│   │   ├── storytelling_agent.py # Heritage storytelling (Granite)
+│   │   ├── encroachment_agent.py # Encroachment detection
+│   │   └── conservation_agent.py # Report generation
+│   ├── orchestrator/
+│   │   └── orchestrator.py       # Central AI coordinator
+│   ├── models/
+│   │   ├── database.py           # SQLAlchemy models
+│   │   ├── db_config.py          # DB session management
+│   │   └── seed_data.py          # Demo data seeder
+│   ├── routes/
+│   │   ├── agents.py             # All agent API endpoints
+│   │   └── sites.py              # Heritage site CRUD
+│   └── services/
+│       └── granite_service.py    # IBM Granite LLM integration
+├── frontend/
+│   └── src/
+│       ├── pages/                # Dashboard, Structural, Visitor...
+│       ├── components/           # ChatAssistant
+│       └── api/client.js         # Axios API client
+├── tests/
+│   └── test_agents.py            # Pytest test suite
+├── .env.example                  # Environment variable template
+├── requirements.txt              # Python dependencies
+├── docker-compose.yml            # Container orchestration
+├── Dockerfile.backend            # Backend Docker image
+└── README.md                     # This file
 ```
 
-Database initializes automatically on first start. Seed data loads automatically.
+---
 
-### Frontend
+## ⚡ Quick Start
+
+### Option A: Local Development
 
 ```bash
+# 1. Clone and enter project
+cd heritageguardian
+
+# 2. Backend setup
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+
+# 3. Configure environment
+cp .env.example .env
+# Edit .env — add GRANITE_API_KEY if available (demo works without it)
+
+# 4. Start backend
+uvicorn backend.main:app --reload --port 8000
+
+# 5. Frontend setup (new terminal)
 cd frontend
 npm install
 npm run dev
+
+# 6. Open http://localhost:3000
 ```
 
-Frontend runs on http://localhost:5173 and proxies `/api` to http://localhost:8000.
-
-## Environment Variables
-
-Copy `.env.example` to `backend/.env`:
+### Option B: Docker
 
 ```bash
-cp .env.example backend/.env
-```
-
-### Required for Granite
-```
-IBM_API_KEY=your-ibm-cloud-api-key
-GRANITE_ENDPOINT=https://us-south.ml.cloud.ibm.com
-WATSONX_PROJECT_ID=your-watsonx-project-id
-GRANITE_MODEL=ibm/granite-3-3-8b-instruct
-```
-
-### Optional
-```
-DATABASE_URL=sqlite:///./heritage.db
-APP_ENV=demo
-CORS_ORIGINS=http://localhost:5173
-```
-
-If Granite is not configured, the platform runs in **controlled demo mode** — all agent logic is fully functional using deterministic fallbacks.
-
-## Database Setup
-
-The database initializes automatically when the backend starts. To reset:
-
-```bash
-cd backend
-python -c "from app.database.db import Base, engine; Base.metadata.drop_all(engine); Base.metadata.create_all(engine)"
-python -c "from app.database.seed import init_db; init_db()"
-```
-
-## Test Commands
-
-```bash
-# Backend tests (36 tests)
-cd backend
-python -m pytest ../tests/test_backend.py -v
-
-# Frontend build verification
-cd frontend
-npm run build
-```
-
-## Demo Workflow (2-3 minutes)
-
-1. Open http://localhost:5173
-2. Click **Explore Heritage** → Heritage Guide
-3. Select **Modhera Sun Temple**, 60 minutes, Architecture, Avoid Crowds
-4. Click **Generate My Heritage Experience** — watch multi-agent execution
-5. View the visitor flow analysis, grounded itinerary, and conservation validation
-6. Check the **Agent Execution Timeline** — backed by real database records
-7. Navigate to **Authority Dashboard** → view alerts and generate a conservation report
-8. Visit **Agents** page → see complete execution history from the database
-
-## API Documentation
-
-- Swagger UI: http://localhost:8000/api/docs
-- ReDoc: http://localhost:8000/api/redoc
-- Full API reference: `docs/API.md`
-
-## Key API Endpoints
-
-```
-GET  /api/health                  — Health check + Granite status
-GET  /api/sites                   — List heritage sites
-GET  /api/sites/{id}              — Site detail with zones
-GET  /api/visitor-flow/{site_id}  — Run Visitor Flow Agent
-POST /api/visitor-flow/analyze    — Analyze with override
-POST /api/heritage-guide          — Run Storytelling Agent
-POST /api/orchestrator/run        — Run full orchestration
-GET  /api/alerts                  — List conservation alerts
-POST /api/conservation/report     — Generate conservation report
-GET  /api/agents/runs             — Agent execution history
-```
-
-## Docker
-
-```bash
+cd heritageguardian
+cp .env.example .env
 docker-compose up --build
+# Open http://localhost:3000
 ```
-
-- Backend: http://localhost:8000
-- Frontend: http://localhost:5173 (dev) or served by nginx (prod)
-
-## Known Limitations
-
-1. **Simulated data** — all visitor counts, structural observations, and encroachment flags are demo data
-2. **No real-time feeds** — visitor data is not connected to any live counting system
-3. **Granite optional** — AI personalization requires IBM API key configuration
-4. **SQLite default** — production deployment should use PostgreSQL
-5. **No authentication** — MVP uses Visitor/Authority role switching only
-
-## Data and Claims Policy
-
-| Label | Meaning |
-|-------|---------|
-| `SIMULATED_DEMO` | Artificially generated data — not real |
-| `VERIFIED_PUBLIC` | Based on publicly available heritage information |
-| `DEMO_CONTENT` | Heritage content for demonstration; verify before publication |
-| `AI_GENERATED_DEMO` | AI-generated report; requires human expert review |
-| `VERIFY BEFORE DEPLOYMENT` | Integration not verified in current environment |
-
-**Human verification is required before acting on any AI recommendation.**
-
-## IBM Integration
-
-- **IBM Bob** — development assistant used throughout implementation
-- **IBM Granite** (ibm/granite-3-3-8b-instruct via watsonx.ai) — runtime AI for personalization, explanation, and report generation
-- All Granite calls have graceful fallback to deterministic logic
-- No credentials are hardcoded — configure via environment variables
 
 ---
 
-*Gujarat Hackathon 2026 · SIMULATED DEMO — not an official conservation system*
+## 🔑 Environment Variables
+
+| Variable | Description | Required |
+|---|---|---|
+| `GRANITE_API_KEY` | IBM Granite/watsonx API key | Optional (demo works without) |
+| `IBM_CLOUD_API_KEY` | IBM Cloud API key for IAM token exchange | Optional |
+| `IBM_PROJECT_ID` | IBM watsonx.ai project ID | Optional |
+| `DATABASE_URL` | DB connection string | Optional (SQLite default) |
+| `ALLOWED_ORIGINS` | CORS origins | Optional |
+
+> Without IBM API keys, the system runs in **Demo Mode** using structured, realistic AI response templates.
+
+---
+
+## 🎬 Demo Instructions
+
+### 3-Minute Hackathon Demo
+
+1. Open http://localhost:3000
+2. Click **"▶ Hackathon Demo"** in the sidebar
+3. Click **"Start Full Demo"** — runs all 8 scenarios automatically
+4. Or run steps individually:
+   - **Dashboard** → HeritageGuardian Command Center
+   - **Visitor Alert** → Simulated crowd event
+   - **Structural Analysis** → AI image analysis demo
+   - **Encroachment Detection** → Boundary monitoring
+   - **Scenario A** → Visitor × Structural cross-agent
+   - **Scenario B** → Encroachment × Structural cross-agent
+   - **Conservation Report** → Full Granite report
+   - **Heritage Story** → Personalized AI guide
+
+5. Click **"AI Chat"** (top right) → try "What is the condition of Modhera?"
+
+---
+
+## 🗄️ Database Schema
+
+| Table | Description |
+|---|---|
+| `sites` | Heritage site registry |
+| `inspections` | Structural inspection records |
+| `structural_alerts` | Active structural alerts |
+| `visitor_data` | Visitor count snapshots |
+| `encroachment_alerts` | Potential encroachment records |
+| `conservation_tasks` | Open/closed conservation work items |
+| `agent_logs` | All agent activity events |
+| `heritage_stories` | Generated visitor stories |
+| `users` | Authority user accounts |
+
+---
+
+## 🔒 Security Features
+
+- No hardcoded credentials — environment variables only
+- Input validation on all endpoints
+- File upload: extension allowlist + size limit (10MB)
+- CORS configuration
+- Global error handling
+- Secure IAM token exchange for IBM Cloud
+
+---
+
+## 🌐 IBM Granite Integration
+
+IBM Granite is used for:
+- **Structural assessment reasoning** — contextual risk interpretation
+- **Visitor flow recommendations** — crowd management synthesis
+- **Encroachment analysis** — boundary change interpretation
+- **Heritage storytelling** — personalized cultural narratives
+- **Conservation report summaries** — authority-ready executive summaries
+- **Orchestrator synthesis** — cross-agent integrated reasoning
+- **Chat assistant** — natural language heritage queries
+
+**Fallback**: When API is unavailable, structured demo responses demonstrate the expected Granite outputs.
+
+---
+
+## ☁️ IBM Cloud Readiness
+
+Pre-configured integration points for:
+- **IBM watsonx.ai** — Granite LLM inference (primary)
+- **IBM Cloud Object Storage** — Heritage image persistence
+- **IBM Watson Visual Recognition** — Production CV model replacement
+- **IBM Cloud PostgreSQL** — Production database
+- **IBM Cloud Monitoring** — Operational observability
+
+---
+
+## 🧪 Running Tests
+
+```bash
+cd heritageguardian
+pip install pytest pytest-asyncio httpx
+pytest tests/ -v
+```
+
+---
+
+## 🔮 Future Improvements
+
+1. **Live IoT Integration** — Real sensor feeds replacing simulated visitor data
+2. **Satellite API** — ISRO/ESA imagery for encroachment detection
+3. **Certified CV Model** — IBM Watson Vision for production structural analysis
+4. **Mobile App** — React Native visitor companion app
+5. **ARCore Integration** — Augmented reality heritage overlay
+6. **Bengali/Tamil/Marathi** — Additional Indian language support
+7. **Offline Mode** — PWA for heritage sites with poor connectivity
+8. **Authority Portal** — Role-based access for ASI, municipalities, state heritage
+9. **Blockchain Evidence** — Tamper-proof encroachment detection records
+10. **Predictive Deterioration** — Time-series structural health forecasting
+
+---
+
+## ⚠️ Important Disclaimers
+
+- **Structural observations** are AI-assisted only — not certified engineering assessments
+- **Encroachment detections** are observations — legal determination requires field verification
+- **Visitor data** is simulated for demonstration — real deployment requires sensor integration
+- **Heritage facts** are based on established records — verify specifics with ASI publications
+
+---
+
+## 👥 Team
+
+| Role | Contribution |
+|---|---|
+| Solution Architect | Platform design, agent architecture |
+| AI/ML Engineer | Granite integration, agent logic |
+| Full-stack Developer | FastAPI backend, React frontend |
+| UX Designer | Heritage-themed dashboard design |
+| Heritage Consultant | Gujarat heritage knowledge base |
+
+---
+
+## 📜 License
+
+MIT License — Built for IBM Hackathon. Heritage data based on publicly available ASI records.
+
+---
+
+*Built with ❤️ for Gujarat's irreplaceable heritage · Powered by IBM Granite AI*

@@ -1,43 +1,16 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-.Python
-*.egg-info/
-dist/
-build/
-.eggs/
-.venv/
-venv/
-env/
 .env
-*.env
-
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-
-# Node
-node_modules/
-frontend/dist/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Test cache
+*.pyc
+__pycache__/
+*.egg-info/
 .pytest_cache/
-.coverage
-htmlcov/
+heritageguardian.db
+test_heritageguardian.db
+uploads/*
+!uploads/.gitkeep
+reports/*
+!reports/.gitkeep
+data/*.db
+node_modules/
+dist/
+.DS_Store
 *.log
-
-# Bob
-.bob/

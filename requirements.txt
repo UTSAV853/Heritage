@@ -1,0 +1,47 @@
+# HeritageGuardian AI — Runtime dependencies
+# Vercel-compatible: all packages have pre-built wheels for Python 3.12 on Linux x86_64.
+
+# Web Framework
+fastapi==0.111.0
+starlette==0.37.2
+python-multipart==0.0.9
+
+# Pydantic v2 — pydantic-core is a Rust extension; list it explicitly so Vercel
+# fetches the correct pre-built wheel for the target Python/platform.
+pydantic==2.7.1
+pydantic-core==2.18.2
+annotated-types==0.7.0
+pydantic-settings==2.3.0
+
+# Async support (required by FastAPI/Starlette)
+anyio==4.4.0
+sniffio==1.3.1
+
+# HTTP Client (for IBM Granite/Cloud API calls)
+httpx==0.27.0
+httpcore==1.0.5
+h11==0.14.0
+certifi>=2024.2.2
+
+# Database — SQLAlchemy pure-Python mode (no C extensions needed)
+sqlalchemy==2.0.30
+greenlet==3.0.3
+
+# Environment variables
+python-dotenv==1.0.1
+
+# Date/time utilities
+python-dateutil==2.9.0
+six==1.16.0
+
+# Typing helpers
+typing-extensions>=4.12.0
+
+# NOTE: The following packages were intentionally excluded (require C extensions
+# that fail to build on Vercel's serverless environment or are dev-only):
+#   uvicorn[standard]  — not needed; Vercel provides its own ASGI server
+#   reportlab          — PDF C extension; not called at runtime
+#   pillow             — image C extension; not imported anywhere
+#   alembic            — DB migrations; dev-only
+#   pytest/black/isort — test/lint tools; dev-only
+# See requirements-dev.txt for local development.

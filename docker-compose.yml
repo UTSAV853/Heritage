@@ -1,43 +1,43 @@
-version: '3.9'
+version: "3.9"
 
 services:
   backend:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: heritage-backend
+      dockerfile: Dockerfile.backend
+    container_name: heritageguardian-backend
     ports:
       - "8000:8000"
     environment:
-      - APP_ENV=demo
-      - DATABASE_URL=sqlite:///./heritage.db
-      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
-      # Uncomment and set for IBM Granite:
-      # - IBM_API_KEY=your-ibm-cloud-api-key
-      # - GRANITE_ENDPOINT=https://us-south.ml.cloud.ibm.com
-      # - WATSONX_PROJECT_ID=your-watsonx-project-id
-      # - GRANITE_MODEL=ibm/granite-3-3-8b-instruct
+      - DATABASE_URL=sqlite:///./heritageguardian.db
+      - GRANITE_API_KEY=${GRANITE_API_KEY:-}
+      - IBM_CLOUD_API_KEY=${IBM_CLOUD_API_KEY:-}
+      - IBM_PROJECT_ID=${IBM_PROJECT_ID:-}
+      - UPLOAD_DIR=/app/uploads
+      - REPORTS_DIR=/app/reports
+      - ALLOWED_ORIGINS=http://localhost:3000
     volumes:
-      - heritage_data:/app/heritage.db
+      - ./uploads:/app/uploads
+      - ./reports:/app/reports
+      - ./data:/app/data
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 15s
-    restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.frontend
-    container_name: heritage-frontend
+    container_name: heritageguardian-frontend
     ports:
-      - "5173:80"
+      - "3000:80"
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     restart: unless-stopped
 
-volumes:
-  heritage_data:
+networks:
+  default:
+    name: heritageguardian-network
