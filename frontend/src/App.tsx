@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Nav from './components/Nav'
 import LandingPage from './pages/LandingPage'
 import VisitorGuidePage from './pages/VisitorGuidePage'
@@ -10,7 +10,7 @@ import ReportsPage from './pages/ReportsPage'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Nav />
       <main className="content">
         <Routes>
@@ -33,6 +33,6 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
