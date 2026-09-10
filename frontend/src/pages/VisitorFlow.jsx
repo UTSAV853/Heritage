@@ -8,6 +8,7 @@ import {
 } from 'recharts'
 import { getVisitorDemo, getSites } from '../api/client'
 import toast from 'react-hot-toast'
+import CustomVisitorTooltip from '../components/CustomVisitorTooltip'
 
 const CROWD_CONFIG = {
   Green:  { label: 'Low',      color: '#22c55e', bg: 'bg-green-950/30  border-green-800/50' },
@@ -197,7 +198,7 @@ export default function VisitorFlow() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
                   <XAxis dataKey="hour" tick={{ fill: '#64748b', fontSize: 10 }} />
                   <YAxis tick={{ fill: '#64748b', fontSize: 10 }} />
-                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: 8 }} />
+                  <Tooltip content={<CustomVisitorTooltip />} />
                   <Area type="monotone" dataKey="visitor_count" stroke={crowdConf.color} fill="url(#vGrad)" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -211,10 +212,10 @@ export default function VisitorFlow() {
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={data.weekly_trend || []}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                  <XAxis dataKey="day" tick={{ fill: '#64748b', fontSize: 11 }} />
-                  <YAxis tick={{ fill: '#64748b', fontSize: 11 }} />
-                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: 8 }} />
-                  <Bar dataKey="visitors" radius={[4, 4, 0, 0]}>
+                  <XAxis dataKey="day" tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }} />
+                  <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} />
+                  <Tooltip content={<CustomVisitorTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
+                  <Bar dataKey="visitors" radius={[5, 5, 0, 0]}>
                     {(data.weekly_trend || []).map((entry, idx) => (
                       <Cell key={idx} fill={entry.visitors > 1100 ? '#f97316' : entry.visitors > 800 ? '#eab308' : '#22c55e'} />
                     ))}

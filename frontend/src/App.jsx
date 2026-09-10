@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Routes, Route, NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Shield, Activity, Users, AlertTriangle,
@@ -19,7 +19,10 @@ import DataMonitoring from './pages/DataMonitoring'
 import ManualDataEntry from './pages/ManualDataEntry'
 import InsightsAlerts from './pages/InsightsAlerts'
 import ChatAssistant from './components/ChatAssistant'
-import { getActivityLog, checkBackendHealth, getCustomApiUrl, setCustomApiUrl } from './api/client'
+import NotificationsDropdown from './components/NotificationsDropdown'
+import {
+  getActivityLog, checkBackendHealth, getCustomApiUrl, setCustomApiUrl, getUnifiedAlerts
+} from './api/client'
 
 const NAV_ITEMS = [
   { path: '/', label: 'Command Center', icon: LayoutDashboard, exact: true },
@@ -43,6 +46,79 @@ export default function App() {
   const [liveAlerts, setLiveAlerts] = useState(4)
   const [backendStatus, setBackendStatus] = useState({ online: false, mode: 'demo', message: 'Demo Simulation Engine Active' })
   const [apiUrlInput, setApiUrlInput] = useState(getCustomApiUrl())
+
+  // Notifications state
+  const [notifOpen, setNotifOpen] = useState(false)
+  const notifRef = useRef(null)
+  const [notifications, setNotifications] = useState([
+    {
+      id: 'notif-1',
+      type: 'ALERT',
+      severity: 'Critical',
+      title: 'High visitor pressure alert',
+      message: 'Modhera Sun Temple headcount reached 410 visitors (82% carrying capacity).',
+      site: 'Modhera Sun Temple',
+      timeAgo: '10 min ago',
+      read: false,
+      link: '/insights'
+    },
+    {
+      id: 'notif-2',
+      type: 'REPORT',
+      severity: 'Moderate',
+      title: 'New conservation report',
+      message: 'Multi-agent structural and condition assessment generated for Rani Ki Vav.',
+      site: 'Rani Ki Vav',
+      timeAgo: '2 hours ago',
+      read: false,
+      link: '/reports'
+    },
+    {
+      id: 'notif-3',
+      type: 'SYSTEM',
+      severity: 'Low',
+      title: 'Data updated from UNESCO',
+      message: 'World Heritage List gazetteer and boundary polygons synchronized.',
+      site: 'Ahmedabad Walled City',
+      timeAgo: '4 hours ago',
+      read: false,
+      link: '/sources'
+    },
+    {
+      id: 'notif-4',
+      type: 'MANUAL_ENTRY',
+      severity: 'Low',
+      title: 'Field inspection logged',
+      message: 'Physical condition survey recorded by ASI inspection warden.',
+      site: 'Sidi Saiyyed Mosque',
+      timeAgo: 'Yesterday',
+      read: true,
+      link: '/data'
+    }
+  ])
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setNotifOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleMarkAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+  }
+
+  const handleClearAllNotifications = () => {
+    setNotifications([])
+    setNotifOpen(false)
+  }
+
+  const handleNotificationClick = (id) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
+  }
 
   const checkStatus = async () => {
     const status = await checkBackendHealth()
@@ -174,12 +250,32 @@ export default function App() {
           </div>
           <div className="flex items-center gap-3">
             <div className="text-xs text-slate-500 hidden md:block">Gujarat Heritage Sites · IBM Granite AI</div>
-            <div className="relative">
-              <Bell size={18} className="text-slate-400 hover:text-slate-200 cursor-pointer" />
-              {liveAlerts > 0 && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full text-[8px] flex items-center justify-center text-white font-bold">
-                  {Math.min(liveAlerts, 9)}
-                </span>
+            {/* Notifications Button & Dropdown */}
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={() => setNotifOpen(!notifOpen)}
+                className={`p-2 rounded-lg transition-colors relative flex items-center justify-center ${
+                  notifOpen ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                }`}
+                title="Notifications"
+                aria-label="Toggle notifications panel"
+              >
+                <Bell size={18} />
+                {notifications.filter(n => !n.read).length > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-orange-500 rounded-full text-[10px] flex items-center justify-center text-white font-extrabold shadow ring-2 ring-slate-900 animate-pulse">
+                    {notifications.filter(n => !n.read).length}
+                  </span>
+                )}
+              </button>
+
+              {notifOpen && (
+                <NotificationsDropdown
+                  notifications={notifications}
+                  onMarkAllAsRead={handleMarkAllAsRead}
+                  onClearAll={handleClearAllNotifications}
+                  onNotificationClick={handleNotificationClick}
+                  onClose={() => setNotifOpen(false)}
+                />
               )}
             </div>
             <button

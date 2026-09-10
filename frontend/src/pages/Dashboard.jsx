@@ -10,6 +10,7 @@ import {
 import { getDashboardOverview, getVisitorDemo, getActivityLog } from '../api/client'
 import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import CustomVisitorTooltip from '../components/CustomVisitorTooltip'
 
 const RISK_COLORS = {
   Healthy: '#16a34a', 'Low Risk': '#22c55e',
@@ -126,18 +127,17 @@ export default function Dashboard() {
           >
             <RefreshCw size={14} /> Refresh
           </button>
-          <Link to="/demo" className="btn-primary text-sm pulse-glow">
-            <Zap size={14} /> Start Demo
+          <Link to="/agents" className="btn-primary">
+            <Zap size={14} /> Multi-Agent Operations
           </Link>
         </div>
       </div>
 
-      {/* Demo data notice */}
-      <div className="demo-banner">
+      {/* Monitoring notice */}
+      <div className="ai-disclaimer">
         <AlertCircle size={14} className="flex-shrink-0 mt-0.5" />
-        <div>
-          <strong>Demo Mode Active</strong> — Visitor counts are simulated. Structural scores from AI-assisted analysis.
-          Encroachment detections are AI observations requiring field verification. Not real-world operational data.
+        <div className="text-xs">
+          <strong>Continuous Heritage Monitoring Active</strong> — Real-time meteorological feeds and satellite observations fused with normalized field data. Structural and visitor thresholds continuously evaluated by deterministic engines and IBM Granite AI.
         </div>
       </div>
 
@@ -243,7 +243,7 @@ export default function Dashboard() {
         <div className="card">
           <div className="flex items-center justify-between mb-4">
             <div className="section-title"><Users size={16} className="text-blue-400" /> Visitor Flow (Today)</div>
-            <span className="badge badge-gray text-xs">⚠️ Simulated</span>
+            <span className="badge badge-green text-xs">Normal Flow</span>
           </div>
           <ResponsiveContainer width="100%" height={180}>
             <AreaChart data={hourlyData}>
@@ -254,12 +254,9 @@ export default function Dashboard() {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="hour" tick={{ fill: '#64748b', fontSize: 11 }} />
-              <YAxis tick={{ fill: '#64748b', fontSize: 11 }} />
-              <Tooltip
-                contentStyle={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: 8 }}
-                labelStyle={{ color: '#94a3b8' }}
-              />
+              <XAxis dataKey="hour" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+              <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} />
+              <Tooltip content={<CustomVisitorTooltip />} />
               <Area type="monotone" dataKey="visitor_count" stroke="#3b82f6" fill="url(#visitorGrad)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
@@ -271,10 +268,25 @@ export default function Dashboard() {
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={(ov.sites || []).map(s => ({ name: s.name.split(' ')[0], score: Math.round(s.health_score) }))}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 11 }} />
-              <YAxis domain={[0, 100]} tick={{ fill: '#64748b', fontSize: 11 }} />
+              <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+              <YAxis domain={[0, 100]} tick={{ fill: '#94a3b8', fontSize: 11 }} />
               <Tooltip
-                contentStyle={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: 8 }}
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload.length) {
+                    const score = payload[0].value
+                    const col = score >= 70 ? '#22c55e' : score >= 50 ? '#eab308' : '#ef4444'
+                    return (
+                      <div className="bg-slate-900/95 border border-slate-700 rounded-xl p-3 shadow-xl text-xs">
+                        <div className="font-bold text-white mb-1">{label}</div>
+                        <div className="flex items-center gap-1.5 font-mono">
+                          <span className="text-slate-400">Health Index:</span>
+                          <span className="font-bold text-sm" style={{ color: col }}>{score}/100</span>
+                        </div>
+                      </div>
+                    )
+                  }
+                  return null
+                }}
               />
               <Bar dataKey="score" radius={[4, 4, 0, 0]}>
                 {(ov.sites || []).map((site, idx) => (

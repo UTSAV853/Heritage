@@ -171,7 +171,7 @@ export default function StructuralMonitoring() {
               {loading ? <><RefreshCw size={14} className="animate-spin" /> Analyzing...</> : <><Cpu size={14} /> Analyze Structure</>}
             </button>
             <button type="button" onClick={runDemo} disabled={loading} className="btn-secondary">
-              Demo
+              Sample Assessment
             </button>
           </div>
         </form>
@@ -183,7 +183,7 @@ export default function StructuralMonitoring() {
               <Activity size={40} className="text-slate-700" />
               <div className="text-center">
                 <div className="font-medium text-slate-400">No analysis yet</div>
-                <div className="text-sm">Upload an image or click Demo to run AI analysis</div>
+                <div className="text-sm">Upload an image or click Sample Assessment to run structural evaluation</div>
               </div>
             </div>
           )}

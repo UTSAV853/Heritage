@@ -337,7 +337,46 @@ export const getMockConservationReport = (siteId = 1) => {
       { id: 104, title: "Intelligent Visitor Flow Stanchion Realignment", priority: "Medium", status: "Completed", deadline: "Done", assigned_department: "Site Administration" }
     ],
     budget_estimate_inr: "₹ 4,85,000",
-    authorized_signoff: "AI Multi-Agent Synthesis · IBM Granite Engine"
+    authorized_signoff: "AI Multi-Agent Synthesis · IBM Granite Engine",
+    key_metrics: {
+      total_visitors: 1280,
+      visitor_trend_pct: 12.0,
+      active_alerts: 3,
+      alerts_trend: 1,
+      site_health: site.health_score || 85.0,
+      health_trend_pct: 5.0,
+      date_range: "1 Sep 2026 – 7 Sep 2026",
+      location_display: site.location || "Ahmedabad, Gujarat, India"
+    },
+    key_findings: [
+      {
+        finding: "High visitor pressure during weekends",
+        status_color: "red",
+        severity: "High",
+        evidence: "Recorded 1,280 visitors vs carrying capacity of 500 (peak surge in Sabha Mandap)",
+        sources: ["Field Inspection (Manual Entry)", "Open-Meteo Weather API", "Turnstile Telemetry"]
+      },
+      {
+        finding: "Minor structural weathering observed",
+        status_color: "yellow",
+        severity: "Moderate",
+        evidence: "Displacement sensors register stable fracture width (1.2mm) below 1.5mm safety threshold",
+        sources: ["ASI Gujarat Circle Telemetry", "Acoustic Vibration Node"]
+      },
+      {
+        finding: "No major encroachment detected",
+        status_color: "green",
+        severity: "Low",
+        evidence: "Statutory 100m prohibited buffer zone verified clear of unauthorized activity",
+        sources: ["ISRO Cartosat Satellite Feed", "State Urban Boundary Registry"]
+      }
+    ],
+    timeline: [
+      { id: 1, date: "07 Sep 2026, 17:30", type: "VISITOR_FLOW", metric: "visitor_count: 480 visitors", origin: "MANUAL_ENTRY", sources: ["Field Officer Patel"], severity: "Critical" },
+      { id: 2, date: "06 Sep 2026, 14:00", type: "ENVIRONMENTAL_CONDITION", metric: "temperature_c: 34.2 °C", origin: "EXTERNAL_SOURCE", sources: ["Open-Meteo Weather API"], severity: "Moderate" },
+      { id: 3, date: "05 Sep 2026, 09:15", type: "STRUCTURAL_INTEGRITY", metric: "crack_width_mm: 1.2 mm", origin: "EXTERNAL_SOURCE", sources: ["ASI Gujarat Circle Telemetry"], severity: "Moderate" },
+      { id: 4, date: "04 Sep 2026, 11:45", type: "ENCROACHMENT", metric: "encroachment_distance_m: 145 m", origin: "EXTERNAL_SOURCE", sources: ["ISRO Cartosat Satellite Feed"], severity: "Low" }
+    ]
   }
 }
 

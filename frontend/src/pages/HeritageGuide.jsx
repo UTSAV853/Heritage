@@ -142,7 +142,9 @@ export default function HeritageGuide() {
             <button onClick={generate} disabled={loading} className="btn-primary flex-1">
               {loading ? <><RefreshCw size={13} className="animate-spin" /> Generating...</> : <><Cpu size={13} /> Generate Story</>}
             </button>
-            <button onClick={demo} disabled={loading} className="btn-secondary text-xs">Demo</button>
+            <button onClick={demo} disabled={loading} className="btn-secondary text-xs">
+              Sample Story
+            </button>
           </div>
         </div>
 

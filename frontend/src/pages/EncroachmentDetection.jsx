@@ -102,7 +102,9 @@ export default function EncroachmentDetection() {
             <button type="submit" disabled={loading} className="btn-primary flex-1">
               {loading ? <><RefreshCw size={14} className="animate-spin" /> Analyzing...</> : <><AlertTriangle size={14} /> Analyze Boundary</>}
             </button>
-            <button type="button" onClick={runDemo} disabled={loading} className="btn-secondary">Demo</button>
+            <button type="button" onClick={runDemo} disabled={loading} className="btn-secondary">
+              Sample Satellite Scan
+            </button>
           </div>
         </form>
 
@@ -112,7 +114,7 @@ export default function EncroachmentDetection() {
               <AlertTriangle size={40} className="text-slate-700" />
               <div className="text-center">
                 <div className="font-medium text-slate-400">Awaiting Analysis</div>
-                <div className="text-sm">Upload images or click Demo to analyze</div>
+                <div className="text-sm">Upload imagery or click Sample Satellite Scan to analyze perimeter</div>
               </div>
             </div>
           )}
