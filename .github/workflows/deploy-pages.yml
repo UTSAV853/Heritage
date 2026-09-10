@@ -39,7 +39,7 @@ jobs:
         run: npm run build
         working-directory: frontend
         env:
-          VITE_BASE_URL: /Heritage/
+          VITE_BASE_URL: /${{ github.event.repository.name }}/
 
       - name: Copy index.html to 404.html for routing safety
         run: cp frontend/dist/index.html frontend/dist/404.html
