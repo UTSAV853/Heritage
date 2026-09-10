@@ -26,5 +26,24 @@ def get_db():
 
 
 def init_db():
-    """Initialize database tables."""
+    """Initialize database tables and apply lightweight migrations if needed."""
     Base.metadata.create_all(bind=engine)
+    if "sqlite" in DATABASE_URL:
+        try:
+            from sqlalchemy import text
+            with engine.connect() as conn:
+                result = conn.execute(text("PRAGMA table_info(sites)")).fetchall()
+                existing_cols = {row[1] for row in result}
+                new_cols = [
+                    ("unesco_id", "VARCHAR(50)"),
+                    ("country_id", "INTEGER"),
+                    ("state_id", "INTEGER"),
+                    ("city_id", "INTEGER"),
+                    ("data_origin", "VARCHAR(50) DEFAULT 'IMPORTED_DATA'")
+                ]
+                for col_name, col_type in new_cols:
+                    if col_name not in existing_cols:
+                        conn.execute(text(f"ALTER TABLE sites ADD COLUMN {col_name} {col_type}"))
+                conn.commit()
+        except Exception:
+            pass

@@ -3,7 +3,7 @@ import { Routes, Route, NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Shield, Activity, Users, AlertTriangle,
   BookOpen, FileText, Zap, Settings, Menu, X, Bot,
-  ChevronRight, Bell, Wifi, WifiOff
+  ChevronRight, Bell, Wifi, WifiOff, Globe, Database, Edit3
 } from 'lucide-react'
 import Dashboard from './pages/Dashboard'
 import HeritageSites from './pages/HeritageSites'
@@ -14,19 +14,26 @@ import HeritageGuide from './pages/HeritageGuide'
 import ConservationReports from './pages/ConservationReports'
 import AgentActivity from './pages/AgentActivity'
 import DemoMode from './pages/DemoMode'
+import SourceManagement from './pages/SourceManagement'
+import DataMonitoring from './pages/DataMonitoring'
+import ManualDataEntry from './pages/ManualDataEntry'
+import InsightsAlerts from './pages/InsightsAlerts'
 import ChatAssistant from './components/ChatAssistant'
 import { getActivityLog, checkBackendHealth, getCustomApiUrl, setCustomApiUrl } from './api/client'
 
 const NAV_ITEMS = [
   { path: '/', label: 'Command Center', icon: LayoutDashboard, exact: true },
   { path: '/sites', label: 'Heritage Sites', icon: Shield },
-  { path: '/structural', label: 'Structural Monitor', icon: Activity },
-  { path: '/visitor', label: 'Visitor Flow', icon: Users },
+  { path: '/visitor', label: 'Visitor Intelligence', icon: Users },
+  { path: '/structural', label: 'Structural Health', icon: Activity },
   { path: '/encroachment', label: 'Encroachment', icon: AlertTriangle },
-  { path: '/guide', label: 'AI Heritage Guide', icon: BookOpen },
   { path: '/reports', label: 'Conservation Reports', icon: FileText },
-  { path: '/agents', label: 'Agent Activity', icon: Zap },
-  { path: '/demo', label: '▶ Hackathon Demo', icon: Bot },
+  { path: '/insights', label: 'Insights & Alerts', icon: Bell },
+  { path: '/data', label: 'Data Monitoring', icon: Database },
+  { path: '/sources', label: 'Data Sources', icon: Globe },
+  { path: '/data-entry', label: 'Field Data Entry', icon: Edit3 },
+  { path: '/guide', label: 'Cultural Guide', icon: BookOpen },
+  { path: '/agents', label: 'Agent Operations', icon: Zap },
 ]
 
 export default function App() {
@@ -105,7 +112,7 @@ export default function App() {
             >
               <span className="flex items-center gap-2 font-medium">
                 {backendStatus.online ? <Wifi size={12} className="text-green-400" /> : <Zap size={12} className="text-emerald-400" />}
-                {backendStatus.online ? 'Backend Online' : 'Demo Engine Active'}
+                {backendStatus.online ? 'Backend Connected' : 'Standalone Pipeline Active'}
               </span>
               <Settings size={12} className="text-slate-400 hover:text-slate-200" />
             </button>
@@ -195,8 +202,17 @@ export default function App() {
             <Route path="/structural" element={<StructuralMonitoring />} />
             <Route path="/visitor" element={<VisitorFlow />} />
             <Route path="/encroachment" element={<EncroachmentDetection />} />
-            <Route path="/guide" element={<HeritageGuide />} />
             <Route path="/reports" element={<ConservationReports />} />
+            <Route path="/insights" element={<InsightsAlerts />} />
+            <Route path="/dashboard/insights" element={<InsightsAlerts />} />
+            <Route path="/alerts" element={<InsightsAlerts />} />
+            <Route path="/data" element={<DataMonitoring />} />
+            <Route path="/dashboard/data" element={<DataMonitoring />} />
+            <Route path="/sources" element={<SourceManagement />} />
+            <Route path="/dashboard/sources" element={<SourceManagement />} />
+            <Route path="/data-entry" element={<ManualDataEntry />} />
+            <Route path="/dashboard/data-entry" element={<ManualDataEntry />} />
+            <Route path="/guide" element={<HeritageGuide />} />
             <Route path="/agents" element={<AgentActivity />} />
             <Route path="/demo" element={<DemoMode />} />
           </Routes>

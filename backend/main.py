@@ -15,6 +15,9 @@ from .models.db_config import init_db, SessionLocal
 from .models.seed_data import seed_database
 from .routes.agents import router as agents_router
 from .routes.sites import router as sites_router
+from .routes.sources import router as sources_router
+from .routes.data import router as data_router
+from .routes.insights import router as insights_router, alerts_router
 
 # Configure logging
 logging.basicConfig(
@@ -94,6 +97,10 @@ app.add_middleware(
 # Mount routers
 app.include_router(agents_router)
 app.include_router(sites_router)
+app.include_router(sources_router)
+app.include_router(data_router)
+app.include_router(insights_router)
+app.include_router(alerts_router)
 
 # Serve uploads as static files (only when aiofiles is available and the dir exists)
 _uploads_dir = Path(os.getenv("UPLOAD_DIR", "./uploads"))

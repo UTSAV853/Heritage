@@ -10,7 +10,12 @@ import {
   getMockActivityLogs,
   getMockChatResponse,
   getMockScenarioA,
-  getMockScenarioB
+  getMockScenarioB,
+  getMockSources,
+  getMockDataRecords,
+  getMockDataQuality,
+  getMockAlerts,
+  getMockInsights
 } from './mockData'
 
 // Detect API base URL
@@ -276,6 +281,118 @@ export const sendChatMessage = (query, siteContext = 'Modhera Sun Temple') =>
   )
 
 // ─────────────────────────────────────────────
+// SMART HERITAGE PLATFORM - UNIFIED APIs
+// ─────────────────────────────────────────────
+
+// SOURCES
+export const getSources = () =>
+  withFallback(
+    () => api.get('/sources/'),
+    () => getMockSources()
+  )
+
+export const getSource = (id) =>
+  withFallback(
+    () => api.get(`/sources/${id}`),
+    () => getMockSources().find(s => s.id === Number(id)) || getMockSources()[0]
+  )
+
+export const refreshSource = (id) =>
+  withFallback(
+    () => api.post(`/sources/${id}/refresh`),
+    () => ({ status: 'success', message: 'Source refreshed and verified.', source_id: id, records_stored: 4 })
+  )
+
+// DATA RECORDS & MANUAL ENTRY
+export const getDataRecords = (params = {}) => {
+  const query = new URLSearchParams()
+  if (params.site_id) query.append('site_id', params.site_id)
+  if (params.origin) query.append('origin', params.origin)
+  if (params.observation_type) query.append('observation_type', params.observation_type)
+  if (params.severity) query.append('severity', params.severity)
+  if (params.limit) query.append('limit', params.limit)
+  if (params.offset) query.append('offset', params.offset)
+
+  const qs = query.toString() ? `?${query.toString()}` : ''
+  return withFallback(
+    () => api.get(`/data/${qs}`),
+    () => getMockDataRecords(params)
+  )
+}
+
+export const getDataQuality = () =>
+  withFallback(
+    () => api.get('/data/quality'),
+    () => getMockDataQuality()
+  )
+
+export const getIngestionRuns = (limit = 20) =>
+  withFallback(
+    () => api.get(`/data/runs?limit=${limit}`),
+    () => [
+      {
+        id: 1,
+        source_name: "Open-Meteo Weather API",
+        status: "SUCCESS",
+        started_at: new Date().toISOString(),
+        completed_at: new Date().toISOString(),
+        records_fetched: 5,
+        records_stored: 5,
+        records_deduplicated: 0,
+        records_rejected: 0,
+        duration_sec: 0.82
+      },
+      {
+        id: 2,
+        source_name: "Wikipedia Heritage Records",
+        status: "SUCCESS",
+        started_at: new Date(Date.now() - 3600000).toISOString(),
+        completed_at: new Date(Date.now() - 3600000).toISOString(),
+        records_fetched: 2,
+        records_stored: 2,
+        records_deduplicated: 0,
+        records_rejected: 0,
+        duration_sec: 0.45
+      }
+    ]
+  )
+
+export const submitManualObservation = (payload) =>
+  withFallback(
+    () => api.post('/data/manual', payload),
+    () => ({
+      status: 'success',
+      message: 'Manual observation successfully validated and stored.',
+      observation_id: Date.now(),
+      data_origin: 'MANUAL_ENTRY'
+    })
+  )
+
+// ALERTS & HUMAN REVIEW
+export const getUnifiedAlerts = (siteId = null) => {
+  const path = siteId ? `/alerts/?site_id=${siteId}` : '/alerts/'
+  return withFallback(
+    () => api.get(path),
+    () => getMockAlerts()
+  )
+}
+
+export const reviewUnifiedAlert = (alertId, payload) =>
+  withFallback(
+    () => api.post(`/alerts/${alertId}/review`, payload),
+    () => ({ status: 'success', message: 'Alert reviewed', alert_id: alertId })
+  )
+
+// INSIGHTS
+export const getUnifiedInsights = (siteId = null) => {
+  const path = siteId ? `/insights/site/${siteId}` : '/insights/'
+  return withFallback(
+    () => api.get(path),
+    () => getMockInsights()
+  )
+}
+
+// ─────────────────────────────────────────────
 // DEMO RESET
 // ─────────────────────────────────────────────
 export const resetDemo = () =>
@@ -285,3 +402,4 @@ export const resetDemo = () =>
   )
 
 export default api
+

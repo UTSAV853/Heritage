@@ -432,3 +432,214 @@ export const getMockScenarioB = (siteName = "Modhera Sun Temple", siteId = 1) =>
     "High-frequency displacement monitoring frequency increased from hourly to every 5 mins."
   ]
 })
+
+export const getMockSources = () => [
+  {
+    id: 1,
+    name: "Open-Meteo Weather API",
+    source_type: "API",
+    authority_tier: "TIER_2",
+    connection_status: "CONNECTED",
+    records_collected: 42,
+    failure_count: 0,
+    is_active: true,
+    last_successful_retrieval: new Date().toISOString(),
+    last_attempt: new Date().toISOString()
+  },
+  {
+    id: 2,
+    name: "Wikipedia Heritage Records",
+    source_type: "REST_API",
+    authority_tier: "TIER_3",
+    connection_status: "CONNECTED",
+    records_collected: 18,
+    failure_count: 0,
+    is_active: true,
+    last_successful_retrieval: new Date().toISOString(),
+    last_attempt: new Date().toISOString()
+  },
+  {
+    id: 3,
+    name: "Archaeological Survey of India (ASI)",
+    source_type: "GOVERNMENT_DATASET",
+    authority_tier: "TIER_1",
+    connection_status: "CONNECTED",
+    records_collected: 85,
+    failure_count: 0,
+    is_active: true,
+    last_successful_retrieval: new Date().toISOString(),
+    last_attempt: new Date().toISOString()
+  },
+  {
+    id: 4,
+    name: "UNESCO World Heritage Centre",
+    source_type: "INSTITUTIONAL_PORTAL",
+    authority_tier: "TIER_1",
+    connection_status: "RESTRICTED",
+    records_collected: 12,
+    failure_count: 1,
+    is_active: true,
+    last_successful_retrieval: new Date(Date.now() - 3600000).toISOString(),
+    last_attempt: new Date().toISOString()
+  }
+]
+
+export const getMockDataRecords = (params = {}) => {
+  const records = [
+    {
+      id: 101,
+      site_id: 1,
+      site_name: "Modhera Sun Temple",
+      data_origin: "EXTERNAL_SOURCE",
+      observation_type: "ENVIRONMENTAL_CONDITION",
+      observation_date: new Date().toISOString(),
+      metric_name: "temperature_c",
+      metric_value: 34.2,
+      unit: "°C",
+      severity: "Moderate",
+      confidence_score: 0.98,
+      status: "VALIDATED",
+      contributing_sources: ["Open-Meteo Weather API"],
+      is_consolidated: false,
+      has_conflicts: false
+    },
+    {
+      id: 102,
+      site_id: 1,
+      site_name: "Modhera Sun Temple",
+      data_origin: "MANUAL_ENTRY",
+      observation_type: "VISITOR_FLOW",
+      observation_date: new Date().toISOString(),
+      metric_name: "visitor_count",
+      metric_value: 410,
+      unit: "visitors",
+      severity: "High",
+      confidence_score: 0.95,
+      status: "VALIDATED",
+      contributing_sources: ["Manual Entry (Field Officer)"],
+      is_consolidated: false,
+      has_conflicts: false
+    },
+    {
+      id: 103,
+      site_id: 2,
+      site_name: "Ahmedabad Walled City",
+      data_origin: "EXTERNAL_SOURCE",
+      observation_type: "STRUCTURAL_INTEGRITY",
+      observation_date: new Date(Date.now() - 7200000).toISOString(),
+      metric_name: "crack_width_mm",
+      metric_value: 1.8,
+      unit: "mm",
+      severity: "High",
+      confidence_score: 0.92,
+      status: "VALIDATED",
+      contributing_sources: ["ASI Gujarat Circle Telemetry"],
+      is_consolidated: false,
+      has_conflicts: false
+    },
+    {
+      id: 104,
+      site_id: 1,
+      site_name: "Modhera Sun Temple",
+      data_origin: "EXTERNAL_SOURCE",
+      observation_type: "ENCROACHMENT",
+      observation_date: new Date(Date.now() - 10800000).toISOString(),
+      metric_name: "encroachment_distance_m",
+      metric_value: 85.0,
+      unit: "meters",
+      severity: "Critical",
+      confidence_score: 0.91,
+      status: "VALIDATED",
+      contributing_sources: ["ISRO Cartosat Satellite Feed"],
+      is_consolidated: false,
+      has_conflicts: false
+    }
+  ]
+
+  if (params.origin && params.origin !== "ALL") {
+    return records.filter(r => r.data_origin === params.origin)
+  }
+  return records
+}
+
+export const getMockDataQuality = () => ({
+  total_records: 157,
+  validated_count: 148,
+  duplicate_count: 6,
+  conflict_count: 2,
+  human_review_count: 3,
+  origins: {
+    EXTERNAL_SOURCE: 112,
+    MANUAL_ENTRY: 35,
+    IMPORTED_DATA: 10,
+    SIMULATED: 0
+  },
+  quality_score_percent: 94.3,
+  evaluation_date: new Date().toISOString()
+})
+
+export const getMockAlerts = () => [
+  {
+    id: 1,
+    site_id: 1,
+    site_name: "Modhera Sun Temple",
+    alert_type: "HIGH_VISITOR_PRESSURE",
+    severity: "High",
+    title: "Critical Visitor Surge (82.0% Capacity)",
+    description: "Current headcount of 410 visitors exceeds 82% of maximum capacity (500). Stagger admissions recommended.",
+    detection_method: "DETERMINISTIC_CAPACITY_THRESHOLD",
+    recommended_action: "Activate visitor diversion protocol; redirect queue to exterior gardens.",
+    human_review_status: "PENDING_REVIEW",
+    created_at: new Date().toISOString(),
+    evidence: {
+      observation_ids: [102],
+      current_value: 410,
+      max_capacity: 500,
+      occupancy_pct: 82.0,
+      sources: ["Manual Entry (Field Officer)"],
+      calculation: "(410 / 500) * 100 = 82.0%"
+    }
+  },
+  {
+    id: 2,
+    site_id: 1,
+    site_name: "Modhera Sun Temple",
+    alert_type: "STATUTORY_BUFFER_ENCROACHMENT",
+    severity: "Critical",
+    title: "Activity Detected Inside 100m Prohibited Buffer Zone",
+    description: "Earthmoving machinery detected 85m from monument boundary (Statutory limit: 100m).",
+    detection_method: "DETERMINISTIC_PROXIMITY_BUFFER",
+    recommended_action: "Issue Section 20A cease-work statutory notice under AMASR Act 1958.",
+    human_review_status: "REQUIRES_HUMAN_REVIEW",
+    created_at: new Date(Date.now() - 3600000).toISOString(),
+    evidence: {
+      observation_ids: [104],
+      prohibited_distance_limit_m: 100,
+      recorded_distance_m: 85.0,
+      breach_margin_m: 15.0,
+      sources: ["ISRO Cartosat Satellite Feed"]
+    }
+  }
+]
+
+export const getMockInsights = () => [
+  {
+    id: 1,
+    site_id: 1,
+    site_name: "Modhera Sun Temple",
+    insight_category: "VISITOR_IMPACT",
+    title: "Visitor Load Stability Assessment",
+    summary: "Site is operating at 82% capacity. 24-hour rate of change is +14.5%.",
+    deterministic_evidence: {
+      current_visitors: 410,
+      max_capacity: 500,
+      occupancy_pct: 82.0,
+      sample_count: 12
+    },
+    granite_reasoning: "IBM Granite Analysis: Visitor distribution reflects elevated localized crowding in Sabha Mandap. Recommend monitoring zone capacity to preserve stone pavement integrity.",
+    uncertainty: 0.05,
+    priority: "High",
+    created_at: new Date().toISOString()
+  }
+]
+
