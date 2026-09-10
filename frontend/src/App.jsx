@@ -15,7 +15,7 @@ import ConservationReports from './pages/ConservationReports'
 import AgentActivity from './pages/AgentActivity'
 import DemoMode from './pages/DemoMode'
 import ChatAssistant from './components/ChatAssistant'
-import { getActivityLog } from './api/client'
+import { getActivityLog, checkBackendHealth, getCustomApiUrl, setCustomApiUrl } from './api/client'
 
 const NAV_ITEMS = [
   { path: '/', label: 'Command Center', icon: LayoutDashboard, exact: true },
@@ -32,23 +32,43 @@ const NAV_ITEMS = [
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [chatOpen, setChatOpen] = useState(false)
-  const [liveAlerts, setLiveAlerts] = useState(0)
-  const [backendOnline, setBackendOnline] = useState(true)
-  // Poll for live alerts
-  useEffect(() => {
-    const check = async () => {
-      try {
-        const res = await getActivityLog(5)
-        setLiveAlerts(res.data.count || 0)
-        setBackendOnline(true)
-      } catch {
-        setBackendOnline(false)
-      }
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [liveAlerts, setLiveAlerts] = useState(4)
+  const [backendStatus, setBackendStatus] = useState({ online: false, mode: 'demo', message: 'Demo Simulation Engine Active' })
+  const [apiUrlInput, setApiUrlInput] = useState(getCustomApiUrl())
+
+  const checkStatus = async () => {
+    const status = await checkBackendHealth()
+    setBackendStatus(status)
+    try {
+      const res = await getActivityLog(5)
+      setLiveAlerts(res.data?.count || 4)
+    } catch {
+      setLiveAlerts(4)
     }
-    check()
-    const iv = setInterval(check, 10000)
+  }
+
+  useEffect(() => {
+    checkStatus()
+    const iv = setInterval(checkStatus, 15000)
     return () => clearInterval(iv)
   }, [])
+
+  const handleSaveApiUrl = (e) => {
+    e.preventDefault()
+    setCustomApiUrl(apiUrlInput.trim())
+    setSettingsOpen(false)
+    checkStatus()
+    window.location.reload()
+  }
+
+  const handleResetToDemo = () => {
+    setCustomApiUrl('')
+    setApiUrlInput('')
+    setSettingsOpen(false)
+    checkStatus()
+    window.location.reload()
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-950">
@@ -73,11 +93,22 @@ export default function App() {
 
         {/* Status indicator */}
         {sidebarOpen && (
-          <div className={`mx-3 mt-2 px-3 py-1.5 rounded-lg text-xs flex items-center gap-2 ${
-            backendOnline ? 'bg-green-950/50 text-green-400 border border-green-900' : 'bg-red-950/50 text-red-400 border border-red-900'
-          }`}>
-            {backendOnline ? <Wifi size={12} /> : <WifiOff size={12} />}
-            {backendOnline ? 'All Agents Online' : 'Backend Offline'}
+          <div className="mx-3 mt-2 flex items-center gap-1.5">
+            <button
+              onClick={() => setSettingsOpen(true)}
+              title="Click to configure backend connection"
+              className={`flex-1 px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between transition-colors ${
+                backendStatus.online
+                  ? 'bg-green-950/50 text-green-400 border border-green-800/80 hover:bg-green-900/40'
+                  : 'bg-emerald-950/40 text-emerald-300 border border-emerald-800/50 hover:bg-emerald-900/30'
+              }`}
+            >
+              <span className="flex items-center gap-2 font-medium">
+                {backendStatus.online ? <Wifi size={12} className="text-green-400" /> : <Zap size={12} className="text-emerald-400" />}
+                {backendStatus.online ? 'Backend Online' : 'Demo Engine Active'}
+              </span>
+              <Settings size={12} className="text-slate-400 hover:text-slate-200" />
+            </button>
           </div>
         )}
 
@@ -174,6 +205,79 @@ export default function App() {
 
       {/* Chat assistant panel */}
       {chatOpen && <ChatAssistant onClose={() => setChatOpen(false)} />}
+
+      {/* Settings modal */}
+      {settingsOpen && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Settings size={18} className="text-heritage-400" />
+                <h3 className="text-base font-semibold text-white">System & Backend Settings</h3>
+              </div>
+              <button onClick={() => setSettingsOpen(false)} className="text-slate-400 hover:text-slate-200">
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-sm">
+              <div className="p-3 rounded-lg bg-slate-800/60 border border-slate-700/60">
+                <div className="text-xs text-slate-400 mb-1">Current Active Mode</div>
+                <div className="flex items-center gap-2 font-medium">
+                  {backendStatus.online ? (
+                    <span className="text-green-400 flex items-center gap-1.5">
+                      <Wifi size={14} /> Live Backend Connected
+                    </span>
+                  ) : (
+                    <span className="text-emerald-400 flex items-center gap-1.5">
+                      <Zap size={14} /> Client Demo Engine Active
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                  {backendStatus.online
+                    ? 'Requests are proxied live to the FastAPI multi-agent backend server.'
+                    : 'Running in self-contained simulation mode. All 5 AI agents, charts, telemetry, and IBM Granite storytelling are fully functional client-side.'}
+                </p>
+              </div>
+
+              <form onSubmit={handleSaveApiUrl} className="space-y-3">
+                <div>
+                  <label className="text-xs font-medium text-slate-300 block mb-1">
+                    Custom Backend API URL (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={apiUrlInput}
+                    onChange={(e) => setApiUrlInput(e.target.value)}
+                    placeholder="e.g. https://your-heritage-api.vercel.app/api"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-heritage-500"
+                  />
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    Leave blank to use the built-in Demo Simulation Engine on GitHub Pages.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleResetToDemo}
+                    className="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+                  >
+                    Reset to Demo Engine
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn-primary text-xs py-1.5 px-3"
+                  >
+                    Save & Reconnect
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

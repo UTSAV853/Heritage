@@ -6,7 +6,7 @@ Entry point for the backend API server.
 import os
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pathlib import Path
@@ -105,48 +105,28 @@ if _uploads_dir.exists():
         pass  # aiofiles not installed (e.g. Vercel serverless) — skip static mount
 
 
-# Serve frontend dist if available (built during Vercel deployment)
-_frontend_dist = Path(__file__).resolve().parent.parent / "frontend" / "dist"
-if not _frontend_dist.exists():
-    _frontend_dist = Path("./frontend/dist")
+def _get_root_info():
+    return {
+        "name": "HeritageGuardian AI",
+        "version": "1.0.0",
+        "status": "operational",
+        "description": "Smart Heritage Conservation & Visitor Experience Platform",
+        "agents": [
+            "Structural Health Monitoring Agent",
+            "Visitor Flow Management Agent",
+            "Personalized Heritage Storytelling Agent",
+            "Encroachment Detection Agent",
+            "Conservation Reporting Agent"
+        ],
+        "powered_by": ["IBM Granite LLM", "IBM Cloud (configurable)", "FastAPI", "React"],
+        "docs": "/api/docs"
+    }
 
-if _frontend_dist.exists() and (_frontend_dist / "index.html").exists():
-    try:
-        from fastapi.staticfiles import StaticFiles
-        from fastapi.responses import FileResponse
 
-        _assets_dir = _frontend_dist / "assets"
-        if _assets_dir.exists():
-            app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="static_assets")
-
-        @app.get("/{full_path:path}")
-        async def serve_frontend(full_path: str):
-            if full_path.startswith("api/") or full_path.startswith("uploads/"):
-                raise HTTPException(status_code=404, detail="Not found")
-            target_file = _frontend_dist / full_path
-            if full_path and target_file.exists() and target_file.is_file():
-                return FileResponse(target_file)
-            return FileResponse(_frontend_dist / "index.html")
-    except Exception as _fe_err:
-        logger.warning(f"Frontend dist mount warning: {_fe_err}")
-else:
-    @app.get("/")
-    async def root():
-        return {
-            "name": "HeritageGuardian AI",
-            "version": "1.0.0",
-            "status": "operational",
-            "description": "Smart Heritage Conservation & Visitor Experience Platform",
-            "agents": [
-                "Structural Health Monitoring Agent",
-                "Visitor Flow Management Agent",
-                "Personalized Heritage Storytelling Agent",
-                "Encroachment Detection Agent",
-                "Conservation Reporting Agent"
-            ],
-            "powered_by": ["IBM Granite LLM", "IBM Cloud (configurable)", "FastAPI", "React"],
-            "docs": "/api/docs"
-        }
+@app.get("/api")
+@app.get("/api/")
+async def api_root():
+    return _get_root_info()
 
 
 @app.get("/api/health")
@@ -167,6 +147,40 @@ async def reset_demo():
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
+
+
+# Serve frontend dist if available (built during Vercel deployment)
+_frontend_dist = Path(__file__).resolve().parent.parent / "frontend" / "dist"
+if not _frontend_dist.exists():
+    _frontend_dist = Path("./frontend/dist")
+
+@app.get("/")
+async def root(request: Request):
+    accept = request.headers.get("accept", "")
+    if "text/html" in accept and _frontend_dist.exists() and (_frontend_dist / "index.html").exists():
+        from fastapi.responses import FileResponse
+        return FileResponse(_frontend_dist / "index.html")
+    return _get_root_info()
+
+if _frontend_dist.exists() and (_frontend_dist / "index.html").exists():
+    try:
+        from fastapi.staticfiles import StaticFiles
+        from fastapi.responses import FileResponse
+
+        _assets_dir = _frontend_dist / "assets"
+        if _assets_dir.exists():
+            app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="static_assets")
+
+        @app.get("/{full_path:path}")
+        async def serve_frontend(full_path: str):
+            if full_path.startswith("api/") or full_path.startswith("uploads/"):
+                raise HTTPException(status_code=404, detail="Not found")
+            target_file = _frontend_dist / full_path
+            if full_path and target_file.exists() and target_file.is_file():
+                return FileResponse(target_file)
+            return FileResponse(_frontend_dist / "index.html")
+    except Exception as _fe_err:
+        logger.warning(f"Frontend dist mount warning: {_fe_err}")
 
 
 @app.exception_handler(Exception)
