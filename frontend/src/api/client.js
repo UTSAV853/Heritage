@@ -207,13 +207,13 @@ export const getEncroachmentDemo = (site = 'Modhera Sun Temple') =>
 export const generateStory = (data) =>
   withFallback(
     () => api.post('/agents/storytelling/generate', data),
-    () => getMockStory(data?.site_name, data?.language, data?.age_group)
+    () => getMockStory(data?.site_name, data?.language, data?.age_group, data?.duration_minutes, data?.interests, data?.experience_type)
   )
 
 export const getStoryDemo = (site, language = 'English', ageGroup = 'Adult (30-60)') =>
   withFallback(
     () => api.get(`/agents/storytelling/demo?site=${encodeURIComponent(site)}&language=${language}&age_group=${encodeURIComponent(ageGroup)}`),
-    () => getMockStory(site, language, ageGroup)
+    () => getMockStory(site, language, ageGroup, 60, ['Architecture', 'History'], 'Educational')
   )
 
 // ─────────────────────────────────────────────
